@@ -18,10 +18,7 @@ Please read these files: "LICENSE", "ADDITIONAL_LICENSE_INFO", "ASSEMBLY_EXCEPTI
 ### Branches
 
 _develop_
-: The default branch. The branch that consumes development and patches to upstream jdk. Corretto builds are generated from this branch.
-
-_upstream-jdk_
-: The branch is similar to master at [openjdk/jdk](https://github.com/openjdk/jdk). This branch merges into develop.
+: The default branch. The branch that consumes development and patches to upstream [openjdk/jdk18](https://github.com/openjdk/jdk18). Corretto builds are generated from this branch.
 
 ### OpenJDK Readme
 ```
