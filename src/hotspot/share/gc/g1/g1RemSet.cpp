@@ -106,7 +106,7 @@ class G1RemSetScanState : public CHeapObj<mtGC> {
   // within a region to claim. Dependent on the region size as proxy for the heap
   // size, we limit the total number of chunks to limit memory usage and maintenance
   // effort of that table vs. granularity of distributing scanning work.
-  // Testing showed that 8 for 1M/2M region, 16 for 4M/8M regions, 32 for 16/32M regions,
+  // Testing showed that 64 for 1M/2M region, 128 for 4M/8M regions, 256 for 16/32M regions,
   // and so on seems to be such a good trade-off.
   static uint get_chunks_per_region(uint log_region_size) {
     // Limit the expected input values to current known possible values of the
@@ -114,7 +114,7 @@ class G1RemSetScanState : public CHeapObj<mtGC> {
     // values for region size.
     assert(log_region_size >= 20 && log_region_size <= 29,
            "expected value in [20,29], but got %u", log_region_size);
-    return 1u << (log_region_size / 2 - 7);
+    return 1u << (log_region_size / 2 - 4);
   }
 
   uint _scan_chunks_per_region;         // Number of chunks per region.
@@ -808,7 +808,7 @@ class G1ScanHRForRegionClosure : public HeapRegionClosure {
       return;
     }
 
-    HeapWord* scan_end = MIN2(card_start + (num_cards << BOTConstants::LogN_words), top);
+    HeapWord* scan_end = MIN2(card_start + (num_cards << BOTConstants::log_card_size_in_words()), top);
     if (_scanned_to >= scan_end) {
       return;
     }
@@ -1423,7 +1423,7 @@ public:
 
     // Merge remembered sets of current candidates.
     {
-      G1GCParPhaseTimesTracker x(p, merge_remset_phase, worker_id, _initial_evacuation /* must_record */);
+      G1GCParPhaseTimesTracker x(p, merge_remset_phase, worker_id, !_initial_evacuation /* allow_multiple_record */);
       G1MergeCardSetStats stats;
       {
         G1MergeCardSetClosure cl(_scan_state);
@@ -1674,7 +1674,7 @@ void G1RemSet::refine_card_concurrently(CardValue* const card_ptr,
 
   // Don't use addr_for(card_ptr + 1) which can ask for
   // a card beyond the heap.
-  HeapWord* end = start + G1CardTable::card_size_in_words;
+  HeapWord* end = start + G1CardTable::card_size_in_words();
   MemRegion dirty_region(start, MIN2(scan_limit, end));
   assert(!dirty_region.is_empty(), "sanity");
 

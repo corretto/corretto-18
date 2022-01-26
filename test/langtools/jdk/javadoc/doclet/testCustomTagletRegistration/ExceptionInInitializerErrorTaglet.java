@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,29 +21,40 @@
  * questions.
  */
 
-/*
- * @test
- * @bug 8059100
- * @summary Test that you can decrease NMT tracking level but not increase it.
- * @modules java.base/jdk.internal.misc
- * @library /test/lib
- * @build sun.hotspot.WhiteBox
- * @run driver jdk.test.lib.helpers.ClassFileInstaller sun.hotspot.WhiteBox
- * @run main/othervm -Xbootclasspath/a:. -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI -XX:NativeMemoryTracking=detail ChangeTrackingLevel
- */
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
-import sun.hotspot.WhiteBox;
+import javax.lang.model.element.Element;
 
-public class ChangeTrackingLevel {
+import com.sun.source.doctree.DocTree;
+import jdk.javadoc.doclet.Taglet;
 
-    public static WhiteBox wb = WhiteBox.getWhiteBox();
-    public static void main(String args[]) throws Exception {
-        boolean testChangeLevel = wb.NMTChangeTrackingLevel();
-        if (testChangeLevel) {
-            System.out.println("NMT level change test passed.");
-        } else {
-            // it also fails if the VM asserts.
-            throw new RuntimeException("NMT level change test failed");
+public class ExceptionInInitializerErrorTaglet implements Taglet {
+
+    static {
+        if (true) {
+            throw new RuntimeException();
         }
     }
-};
+
+    @Override
+    public Set<Taglet.Location> getAllowedLocations() {
+        return EnumSet.allOf(Taglet.Location.class);
+    }
+
+    @Override
+    public boolean isInlineTag() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return "ExceptionInInitializerErrorTaglet";
+    }
+
+    @Override
+    public String toString(List<? extends DocTree> tags, Element element) {
+        return "";
+    }
+}
