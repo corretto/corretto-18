@@ -224,6 +224,49 @@ AC_DEFUN_ONCE([LIB_SETUP_ZLIB],
   AC_SUBST(USE_EXTERNAL_LIBZ)
   AC_SUBST(LIBZ_CFLAGS)
   AC_SUBST(LIBZ_LIBS)
+
+  # Should we bundle additional zlib versions?
+  AC_MSG_CHECKING([which additional zlib variants to bundle])
+  AC_ARG_WITH([additional-zlib], [AS_HELP_STRING([--with-additional-zlib],
+      [bundle additional zlib versions (cloudflare,chromium) @<:@@:>@])])
+
+  USE_ZLIB_CLOUDFLARE=false
+  USE_ZLIB_CHROMIUM=false
+
+  ZLIB_VARIANTS=",$with_additional_zlib,"
+  TEST_ZLIB_VARIANTS=`$ECHO "$ZLIB_VARIANTS" | $SED -e 's/cloudflare,//' -e 's/chromium,//'`
+
+  if test "x$with_additional_zlib" != x && test "x$TEST_ZLIB_VARIANTS" != "x,"; then
+    AC_MSG_ERROR([The available, additional zlib variants are: cloudflare, chromium])
+  fi
+
+  ZLIB_VARIANT_CLOUDFLARE=`$ECHO "$ZLIB_VARIANTS" | $SED -e '/,cloudflare,/!s/.*/false/g' -e '/,cloudflare,/s/.*/true/g'`
+  ZLIB_VARIANT_CHROMIUM=`$ECHO "$ZLIB_VARIANTS" | $SED -e '/,chromium,/!s/.*/false/g' -e '/,chromium,/s/.*/true/g'`
+
+  if test "x$ZLIB_VARIANT_CLOUDFLARE" == xtrue; then
+    if { test "x$OPENJDK_TARGET_CPU" = "xx86_64" &&
+         { test "x$OPENJDK_TARGET_OS" = xlinux || test "x$OPENJDK_TARGET_OS" = xwindows; };
+       } ||
+       { test "x$OPENJDK_TARGET_CPU" = "xaarch64" && test "x$OPENJDK_TARGET_OS" = xlinux; }; then
+      USE_ZLIB_CLOUDFLARE=true
+    else
+      AC_MSG_ERROR([zlib variant 'cloudflare' currently only supported on Linux/Windows/x86_64 & Linux/aarch64])
+    fi
+  fi
+  if test "x$ZLIB_VARIANT_CHROMIUM" == xtrue; then
+    if { test "x$OPENJDK_TARGET_CPU" = "xx86_64" &&
+         { test "x$OPENJDK_TARGET_OS" = xlinux || test "x$OPENJDK_TARGET_OS" = xwindows; };
+       } ||
+       { test "x$OPENJDK_TARGET_CPU" = "xaarch64" && test "x$OPENJDK_TARGET_OS" = xlinux; }; then
+      USE_ZLIB_CHROMIUM=true
+    else
+      AC_MSG_ERROR([zlib variant 'chromium' currently only supported on Linux/Windows/x86_64 & Linux/aarch64])
+    fi
+  fi
+  AC_MSG_RESULT([$with_additional_zlib])
+
+  AC_SUBST(USE_ZLIB_CLOUDFLARE)
+  AC_SUBST(USE_ZLIB_CHROMIUM)
 ])
 
 ################################################################################

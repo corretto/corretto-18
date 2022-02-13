@@ -60,6 +60,7 @@
 #include "oops/symbol.hpp"
 #include "prims/jvm_misc.hpp"
 #include "runtime/arguments.hpp"
+#include "runtime/globals_extension.hpp"
 #include "runtime/handles.inline.hpp"
 #include "runtime/init.hpp"
 #include "runtime/interfaceSupport.inline.hpp"
@@ -92,6 +93,7 @@ typedef jzentry* (*FindEntry_t)(jzfile *zip, const char *name, jint *sizeP, jint
 typedef jboolean (*ReadEntry_t)(jzfile *zip, jzentry *entry, unsigned char *buf, char *namebuf);
 typedef jzentry* (*GetNextEntry_t)(jzfile *zip, jint n);
 typedef jint     (*Crc32_t)(jint crc, const jbyte *buf, jint len);
+typedef void     (*ZipSwitchImplementation_t)(const char *implementation);
 
 static ZipOpen_t         ZipOpen            = NULL;
 static ZipClose_t        ZipClose           = NULL;
@@ -99,6 +101,7 @@ static FindEntry_t       FindEntry          = NULL;
 static ReadEntry_t       ReadEntry          = NULL;
 static GetNextEntry_t    GetNextEntry       = NULL;
 static Crc32_t           Crc32              = NULL;
+static ZipSwitchImplementation_t ZipSwitchImplementation = NULL;
 int ClassLoader::_libzip_loaded = 0;
 
 // Entry points for jimage.dll for loading jimage file entries
@@ -956,6 +959,13 @@ void ClassLoader::load_zip_library() {
   ReadEntry = CAST_TO_FN_PTR(ReadEntry_t, dll_lookup(handle, "ZIP_ReadEntry", path));
   GetNextEntry = CAST_TO_FN_PTR(GetNextEntry_t, dll_lookup(handle, "ZIP_GetNextEntry", path));
   Crc32 = CAST_TO_FN_PTR(Crc32_t, dll_lookup(handle, "ZIP_CRC32", path));
+  ZipSwitchImplementation = CAST_TO_FN_PTR(ZipSwitchImplementation_t, os::dll_lookup(handle, "ZIP_SwitchImplementation"));
+
+  if (ZipSwitchImplementation != NULL) {
+    if (!FLAG_IS_DEFAULT(ZlibImplementation)) {
+      ZipSwitchImplementation(ZlibImplementation);
+    }
+  }
 }
 
 void ClassLoader::load_jimage_library() {
@@ -1403,7 +1413,9 @@ void ClassLoader::initialize(TRAPS) {
 
     NEWPERFEVENTCOUNTER(_unsafe_defineClassCallCounter, SUN_CLS, "unsafeDefineClassCalls");
   }
-
+  if (!FLAG_IS_DEFAULT(ZlibImplementation)) {
+    load_zip_library_if_needed();
+  }
   // lookup java library entry points
   load_java_library();
   // jimage library entry points are loaded below, in lookup_vm_options

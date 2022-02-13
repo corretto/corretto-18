@@ -33,6 +33,7 @@
 #include "jni.h"
 #include "jni_util.h"
 #include <zlib.h>
+#include "dispatch.h"
 
 #include "java_util_zip_Deflater.h"
 
@@ -49,9 +50,9 @@ Java_java_util_zip_Deflater_init(JNIEnv *env, jclass cls, jint level,
         return jlong_zero;
     } else {
         const char *msg;
-        int ret = deflateInit2(strm, level, Z_DEFLATED,
-                               nowrap ? -MAX_WBITS : MAX_WBITS,
-                               DEF_MEM_LEVEL, strategy);
+        int ret = deflateInit2_func(strm, level, Z_DEFLATED,
+                                    nowrap ? -MAX_WBITS : MAX_WBITS,
+                                    DEF_MEM_LEVEL, strategy);
         switch (ret) {
           case Z_OK:
             return ptr_to_jlong(strm);
@@ -105,7 +106,7 @@ Java_java_util_zip_Deflater_setDictionary(JNIEnv *env, jclass cls, jlong addr,
     Bytef *buf = (*env)->GetPrimitiveArrayCritical(env, b, 0);
     if (buf == NULL) /* out of memory */
         return;
-    res = deflateSetDictionary(jlong_to_ptr(addr), buf + off, len);
+    res = deflateSetDictionary_func(jlong_to_ptr(addr), buf + off, len);
     (*env)->ReleasePrimitiveArrayCritical(env, b, buf, 0);
     checkSetDictionaryResult(env, addr, res);
 }
@@ -116,7 +117,7 @@ Java_java_util_zip_Deflater_setDictionaryBuffer(JNIEnv *env, jclass cls, jlong a
 {
     int res;
     Bytef *buf = jlong_to_ptr(bufferAddr);
-    res = deflateSetDictionary(jlong_to_ptr(addr), buf, len);
+    res = deflateSetDictionary_func(jlong_to_ptr(addr), buf, len);
     checkSetDictionaryResult(env, addr, res);
 }
 
@@ -137,9 +138,9 @@ static jint doDeflate(JNIEnv *env, jlong addr,
     if (setParams) {
         int strategy = (params >> 1) & 3;
         int level = params >> 3;
-        res = deflateParams(strm, level, strategy);
+        res = deflateParams_func(strm, level, strategy);
     } else {
-        res = deflate(strm, flush);
+        res = deflate_func(strm, flush);
     }
     return res;
 }
@@ -295,7 +296,7 @@ Java_java_util_zip_Deflater_getAdler(JNIEnv *env, jclass cls, jlong addr)
 JNIEXPORT void JNICALL
 Java_java_util_zip_Deflater_reset(JNIEnv *env, jclass cls, jlong addr)
 {
-    if (deflateReset((z_stream *)jlong_to_ptr(addr)) != Z_OK) {
+    if (deflateReset_func((z_stream *)jlong_to_ptr(addr)) != Z_OK) {
         JNU_ThrowInternalError(env, "deflateReset failed");
     }
 }
@@ -303,7 +304,7 @@ Java_java_util_zip_Deflater_reset(JNIEnv *env, jclass cls, jlong addr)
 JNIEXPORT void JNICALL
 Java_java_util_zip_Deflater_end(JNIEnv *env, jclass cls, jlong addr)
 {
-    if (deflateEnd((z_stream *)jlong_to_ptr(addr)) == Z_STREAM_ERROR) {
+    if (deflateEnd_func((z_stream *)jlong_to_ptr(addr)) == Z_STREAM_ERROR) {
         JNU_ThrowInternalError(env, "deflateEnd failed");
     } else {
         free((z_stream *)jlong_to_ptr(addr));
