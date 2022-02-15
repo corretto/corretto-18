@@ -2054,7 +2054,7 @@ const intx ObjectAlignmentInBytes = 8;
   product(ccstr, ZlibImplementation, "bundled",                             \
           "Zlib implementation. One of \"bundled\", \"chromium\" "          \
           "or \"cloudflare\". "                                             \
-          "Ignored if the JDK was configured with \"--with-zlib=system\""   \
+          "Ignored if the JDK was configured with \"--with-zlib=system\". " \
           "\"cloudflare\" is only available if the JDK was "                \
           "configured with \"--with-additional-zlib=cloudflare\". "         \
           "\"chromium\" is only available if the JDK was "                  \
