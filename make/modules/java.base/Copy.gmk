@@ -223,10 +223,13 @@ TARGETS += $(COPY_JDK_NOTICES)
 # bundled or linked from the OS.
 #
 ifeq ($(USE_EXTERNAL_LIBZ), true)
-  # zlib-cloudflare is always bundled
-  ifneq ($(USE_ZLIB_CLOUDFLARE), true)
     LEGAL_EXCLUDES += zlib.md
-  endif
+endif
+ifneq ($(USE_ZLIB_CLOUDFLARE), true)
+    LEGAL_EXCLUDES += zlib_cloudflare.md
+endif
+ifneq ($(USE_ZLIB_CHROMIUM), true)
+    LEGAL_EXCLUDES += zlib-chromium.md
 endif
 
 $(eval $(call SetupCopyLegalFiles, COPY_LEGAL, \
