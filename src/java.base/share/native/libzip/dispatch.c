@@ -131,7 +131,6 @@ extern crc32_type Cr_z_crc32;
 void JNICALL
 ZIP_SwitchImplementation(const char *implementation) {
     static const char *BUNDLED = "bundled";
-    static const char *SYSTEM = "system";
     static const char *CLOUDFLARE = "cloudflare";
     static const char *CHROMIUM = "chromium";
 
@@ -151,32 +150,6 @@ ZIP_SwitchImplementation(const char *implementation) {
         deflateEnd_func = &deflateEnd;
         adler32_func = &adler32;
         crc32_func = &crc32;
-    }
-    else if (!strncmp(SYSTEM, implementation, strlen(SYSTEM))) {
-#if defined(__linux__)
-        void *zlib = dlopen("libz.so", RTLD_LAZY | RTLD_LOCAL);
-        if (zlib != NULL) {
-            char libz_location[PATH_MAX];
-            if (dlinfo(zlib, RTLD_DI_ORIGIN, libz_location) == 0) {
-                fprintf(stdout, "Info: loaded libz.so from %s\n", libz_location);
-            }
-            inflateInit2_func_ = (inflateInit2_type)dlsym(zlib, "inflateInit2_");
-            inflateReset_func = (inflateReset_type)dlsym(zlib, "inflateReset");
-            inflate_func = (inflate_type)dlsym(zlib, "inflate");
-            inflateSetDictionary_func = (inflateSetDictionary_type)dlsym(zlib, "inflateSetDictionary");
-            inflateEnd_func = (inflateEnd_type)dlsym(zlib, "inflateEnd");
-            deflateInit2_func_ = (deflateInit2_type)dlsym(zlib, "deflateInit2_");
-            deflateParams_func = (deflateParams_type)dlsym(zlib, "deflateParams");
-            deflate_func = (deflate_type)dlsym(zlib, "deflate");
-            deflateReset_func = (deflateReset_type)dlsym(zlib, "deflateReset");
-            deflateSetHeader_func = (deflateSetHeader_type)dlsym(zlib, "deflateSetHeader");
-            deflateSetDictionary_func = (deflateSetDictionary_type)dlsym(zlib, "deflateSetDictionary");
-            deflateEnd_func = (deflateEnd_type)dlsym(zlib, "deflateEnd");
-            deflateBound_func = (deflateBound_type)dlsym(zlib, "deflateBound");
-            adler32_func = (adler32_type)dlsym(zlib, "adler32");
-            crc32_func = (crc32_type)dlsym(zlib, "crc32");
-        }
-#endif /* __linux__ */
     }
 #if defined(ZLIB_CLOUDFLARE)
     else if (!strncmp(CLOUDFLARE, implementation, strlen(CLOUDFLARE))) {
