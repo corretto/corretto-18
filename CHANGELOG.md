@@ -21,7 +21,7 @@ The following issues are addressed in 18.0.1.10.1
 
 | Issue Name       | Platform | Description                                | Link |
 |------------------| --- |--------------------------------------------| --- |
-| Import jdk-18.0.1+10 | All | Updates Corretto baseline to OpenJDK 18+37 | [jdk-18.0.1+10](https://github.com/openjdk/jdk18u/releases/tag/jdk-18.0.1%2B10)
+| Import jdk-18.0.1+10 | All | Updates Corretto baseline to OpenJDK 18.0.1+10 | [jdk-18.0.1+10](https://github.com/openjdk/jdk18u/releases/tag/jdk-18.0.1%2B10)
 | Update zlib | All | CVE-2018-25032: based upon our analysis, OpenJDK/Corretto is not affected by CVE-2018-25032, because the zlib “memLevel” parameter is not settable and is fixed at 8, and the usage of the Z_FIXED strategy is prevented. With these settings there is no way to invoke the issue described in the CVE and we only include this fix out of an abundance of caution. | |
 
  The following CVEs are addressed in 18.0.1.10.1
