@@ -48,7 +48,7 @@ public final class Token {
     static final char DOT = '.';
     static final char AT = '@';
     static final char US = '_';
-    static final char COLON_CHAR = ':';
+    static final char COLON = ':';
     static final char SQ = '\'';
     static final char DQ = '"';
     static final char DOLLAR = '$';
