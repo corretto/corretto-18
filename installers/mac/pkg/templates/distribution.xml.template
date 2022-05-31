@@ -4,7 +4,7 @@
     <!--+==========================+
         |       Presentation       |
         +==========================+-->
-    <title>Amazon Corretto 8</title>
+    <title>Amazon Corretto @major@</title>
     <background file="amazon.png" scaling="proportional" alignment="bottomleft"/>
     <background-darkAqua file="amazon.png" scaling="proportional" alignment="bottomleft"/>
     <welcome file="introduction.html"/>
@@ -20,5 +20,5 @@
     <!--+==========================+
         |    Package References    |
         +==========================+-->
-    <pkg-ref id="com.amazon.corretto.8" version="@full@" auth="root" customLocation="/Library/Java/JavaVirtualMachines/amazon-corretto-8.jdk">amazon-corretto-8.jdk.pkg</pkg-ref>
+    <pkg-ref id="com.amazon.corretto.@major@" version="@full@" auth="root" customLocation="/Library/Java/JavaVirtualMachines/amazon-corretto-@major@.jdk">amazon-corretto-@major@.jdk.pkg</pkg-ref>
 </installer-gui-script>
