@@ -110,7 +110,7 @@ task generateInstaller {
             "--resources", "resources",
             "--package-path", "build/components",
             "--version", project.version.full,
-            "build/amazon-corretto-${project.version.full}-macosx-${correttoArch}.pkg"
+            "${distributionDir}/amazon-corretto-${project.version.full}-macosx-${correttoArch}.pkg"
         }
     }
 }
