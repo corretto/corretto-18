@@ -45,6 +45,7 @@ public final class Token {
     static final char LPAREN = '(';
     static final char RPAREN = ')';
     static final char COMMA = ',';
+    static final char DOT = '.';
     static final char AT = '@';
     static final char US = '_';
     static final char COLON_CHAR = ':';
@@ -57,7 +58,7 @@ public final class Token {
     static final String DIV = "div";
     static final String MOD = "mod";
     static final String QUO = "quo";
-    static final String DOT = ".";
+    static final String DOT_STR = ".";
     static final String DDOT = "..";
     static final String DCOLON = "::";
     static final String ATTR = "attribute";
