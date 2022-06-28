@@ -45,6 +45,7 @@
 #include "io_util_md.h"
 #include "zip_util.h"
 #include <zlib.h>
+#include "dispatch.h"
 
 #ifdef _ALLBSD_SOURCE
 #define off64_t off_t
@@ -1423,7 +1424,7 @@ InflateFully(jzfile *zip, jzentry *entry, void *buf, char **msg)
     }
 
     memset(&strm, 0, sizeof(z_stream));
-    if (inflateInit2(&strm, -MAX_WBITS) != Z_OK) {
+    if (inflateInit2_func(&strm, -MAX_WBITS) != Z_OK) {
         *msg = strm.msg;
         return JNI_FALSE;
     }
@@ -1440,7 +1441,7 @@ InflateFully(jzfile *zip, jzentry *entry, void *buf, char **msg)
             if (n == 0) {
                 *msg = "inflateFully: Unexpected end of file";
             }
-            inflateEnd(&strm);
+            inflateEnd_func(&strm);
             return JNI_FALSE;
         }
         pos += n;
@@ -1448,13 +1449,13 @@ InflateFully(jzfile *zip, jzentry *entry, void *buf, char **msg)
         strm.next_in = (Bytef *)tmp;
         strm.avail_in = n;
         do {
-            switch (inflate(&strm, Z_PARTIAL_FLUSH)) {
+            switch (inflate_func(&strm, Z_PARTIAL_FLUSH)) {
             case Z_OK:
                 break;
             case Z_STREAM_END:
                 if (count != 0 || strm.total_out != (uInt)entry->size) {
                     *msg = "inflateFully: Unexpected end of stream";
-                    inflateEnd(&strm);
+                    inflateEnd_func(&strm);
                     return JNI_FALSE;
                 }
                 break;
@@ -1464,7 +1465,7 @@ InflateFully(jzfile *zip, jzentry *entry, void *buf, char **msg)
         } while (strm.avail_in > 0);
     }
 
-    inflateEnd(&strm);
+    inflateEnd_func(&strm);
     return JNI_TRUE;
 }
 
@@ -1557,7 +1558,7 @@ ZIP_InflateFully(void *inBuf, jlong inLen, void *outBuf, jlong outLen, char **pm
 
     *pmsg = 0; /* Reset error message */
 
-    if (inflateInit2(&strm, MAX_WBITS) != Z_OK) {
+    if (inflateInit2_func(&strm, MAX_WBITS) != Z_OK) {
         *pmsg = strm.msg;
         return JNI_FALSE;
     }
@@ -1568,32 +1569,32 @@ ZIP_InflateFully(void *inBuf, jlong inLen, void *outBuf, jlong outLen, char **pm
     strm.avail_in = (uInt)inLen;
 
     do {
-        switch (inflate(&strm, Z_PARTIAL_FLUSH)) {
+        switch (inflate_func(&strm, Z_PARTIAL_FLUSH)) {
             case Z_OK:
                 break;
             case Z_STREAM_END:
                 if (strm.total_out != (uInt)outLen) {
                     *pmsg = "INFLATER_inflateFully: Unexpected end of stream";
-                    inflateEnd(&strm);
+                    inflateEnd_func(&strm);
                     return JNI_FALSE;
                 }
                 break;
             case Z_DATA_ERROR:
                 *pmsg = "INFLATER_inflateFully: Compressed data corrupted";
-                inflateEnd(&strm);
+                inflateEnd_func(&strm);
                 return JNI_FALSE;
             case Z_MEM_ERROR:
                 *pmsg = "INFLATER_inflateFully: out of memory";
-                inflateEnd(&strm);
+                inflateEnd_func(&strm);
                 return JNI_FALSE;
             default:
                 *pmsg = "INFLATER_inflateFully: internal error";
-                inflateEnd(&strm);
+                inflateEnd_func(&strm);
                 return JNI_FALSE;
         }
     } while (strm.avail_in > 0);
 
-    inflateEnd(&strm);
+    inflateEnd_func(&strm);
     return JNI_TRUE;
 }
 
@@ -1625,7 +1626,7 @@ static void zlib_block_free(voidpf opaque, voidpf address) {
 }
 
 static char const* deflateInit2Wrapper(z_stream* strm, int level) {
-  int err = deflateInit2(strm, level >= 0 && level <= 9 ? level : Z_DEFAULT_COMPRESSION,
+  int err = deflateInit2_func(strm, level >= 0 && level <= 9 ? level : Z_DEFAULT_COMPRESSION,
                          Z_DEFLATED, 31, 8, Z_DEFAULT_STRATEGY);
   if (err == Z_MEM_ERROR) {
     return "Out of memory in deflateInit2";
@@ -1652,8 +1653,8 @@ ZIP_GZip_InitParams(size_t inLen, size_t* outLen, size_t* tmpLen, int level) {
   errorMsg = deflateInit2Wrapper(&strm, level);
 
   if (errorMsg == NULL) {
-    *outLen = (size_t) deflateBound(&strm, (uLong) inLen);
-    deflateEnd(&strm);
+    *outLen = (size_t) deflateBound_func(&strm, (uLong) inLen);
+    deflateEnd_func(&strm);
   }
 
   return errorMsg;
@@ -1684,10 +1685,10 @@ ZIP_GZip_Fully(char* inBuf, size_t inLen, char* outBuf, size_t outLen, char* tmp
     if (comment != NULL) {
       memset(&hdr, 0, sizeof(hdr));
       hdr.comment = (Bytef*) comment;
-      deflateSetHeader(&strm, &hdr);
+      deflateSetHeader_func(&strm, &hdr);
     }
 
-    err = deflate(&strm, Z_FINISH);
+    err = deflate_func(&strm, Z_FINISH);
 
     if (err == Z_OK || err == Z_BUF_ERROR) {
       *pmsg = "Buffer too small";
@@ -1697,7 +1698,7 @@ ZIP_GZip_Fully(char* inBuf, size_t inLen, char* outBuf, size_t outLen, char* tmp
       result = (size_t) strm.total_out;
     }
 
-    deflateEnd(&strm);
+    deflateEnd_func(&strm);
   }
 
   return result;
