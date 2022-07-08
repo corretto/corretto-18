@@ -2,6 +2,18 @@
 
 The following sections describe the changes for each release of Amazon Corretto 18.
 
+## Corretto version: 18.0.2.9.1
+Release Date: July 19, 2022
+
+ **Target Platforms**
+
+
+ The following issues are addressed in 18.0.2.9.1
+
+
+ The following CVEs are addressed in 18.0.2.9.1
+
+
 ## Corretto version: 18.0.1.10.1
 
 Release Date: April 19, 2022
