@@ -18,24 +18,24 @@ Release Date: July 19, 2022
 
  The following issues are addressed in 18.0.2.9.1
 
-| Issue Name                                 | Platform | Description                                                                          | Link                                                                           |
-|--------------------------------------------|----------|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| Import jdk-18.0.2+9                        | All      | Updates Corretto baseline to OpenJDK 18.0.2+9                                        | [jdk-18.0.2+9](https://github.com/openjdk/jdk18u/releases/tag/jdk-18.0.2%2B9) 
-| Fix src.rpm name that some tools depend on | Linux    | Updates src.rpm name                                                                 | [#27](https://github.com/corretto/corretto-18/pull/27)                         
-| Only require log4j-cve-mitigations on AL2  | AL2      | Updates log4j-cve-mitigations to AL2 only                                            | [#30](https://github.com/corretto/corretto-18/pull/30)                         
-| The documentation update                   | All      | Updates to code of conduct and contributing documentation                            | [#31](https://github.com/corretto/corretto-18/pull/31)                         
-| Revert and reapply macos packaging updates | macOS    | Updates to macos packaging                                                           | [#32](https://github.com/corretto/corretto-18/pull/32)                         
-| Enable bundled zlib library via Gradle     | macOS    | Updates to use bundled (not the system) version of the zlib library on macOS aarch64 | [#36](https://github.com/corretto/corretto-18/pull/36)                         |
-
+| Issue Name                                 | Platform | Description                                                                          | Link                                                                          |
+|--------------------------------------------|----------|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Import jdk-18.0.2+9                        | All      | Updates Corretto baseline to OpenJDK 18.0.2+9                                        | [jdk-18.0.2+9](https://github.com/openjdk/jdk18u/releases/tag/jdk-18.0.2%2B9) |
+| Fix src.rpm name that some tools depend on | Linux    | Updates src.rpm name                                                                 | [#27](https://github.com/corretto/corretto-18/pull/27)                        |
+| Only require log4j-cve-mitigations on AL2  | AL2      | Updates log4j-cve-mitigations to AL2 only                                            | [#30](https://github.com/corretto/corretto-18/pull/30)                        |
+| The documentation update                   | All      | Updates to code of conduct and contributing documentation                            | [#31](https://github.com/corretto/corretto-18/pull/31)                        |
+| Revert and reapply macos packaging updates | macOS    | Updates to macos packaging                                                           | [#32](https://github.com/corretto/corretto-18/pull/32)                        |
+| Enable bundled zlib library via Gradle     | macOS    | Updates to use bundled (not the system) version of the zlib library on macOS aarch64 | [#36](https://github.com/corretto/corretto-18/pull/36)                        |
+| Update amazon cacerts                      | All      | Update amazon cacerts file from amazonlinux                                          | [#35](https://github.com/corretto/corretto-18/pull/35)                        |
 
  The following CVEs are addressed in 18.0.2.9.1
 
-| CVE | CVSS | Component |
- | --- | --- | --- |
-| CVE-2022-34169 | 7.5 |  |
-| CVE-2022-21541 | 5.9 |  |
-| CVE-2022-21549 | 5.3 |  |
-| CVE-2022-21540 | 5.3 |  |
+| CVE | CVSS | Component           |
+ | --- |---------------------| --- |
+| CVE-2022-34169 | 7.5 | xml/jaxp            |
+| CVE-2022-21541 | 5.9 | hotspot/runtime     |
+| CVE-2022-21549 | 5.3 | core-libs/java.util |
+| CVE-2022-21540 | 5.3 | hotspot/compiler    |
 
 
 ## Corretto version: 18.0.1.10.1
